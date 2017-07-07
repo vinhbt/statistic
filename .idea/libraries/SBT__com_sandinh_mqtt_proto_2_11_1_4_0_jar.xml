@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: com.sandinh:mqtt-proto_2.11:1.4.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/local/com.sandinh/mqtt-proto_2.11/1.4.0/jars/mqtt-proto_2.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/local/com.sandinh/mqtt-proto_2.11/1.4.0/srcs/mqtt-proto_2.11-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

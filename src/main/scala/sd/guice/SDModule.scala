@@ -1,14 +1,16 @@
 package sd.guice
 
-import akka.actor.ActorSystem
 import com.google.inject.AbstractModule
-import com.typesafe.config.Config
+import com.google.inject.name.Names
+import play.api.{ Configuration, Environment }
+import play.api.libs.concurrent.AkkaGuiceSupport
 
-class SDModule(config: Config) extends AbstractModule {
+class SDModule(env: Environment, cfg: Configuration) extends AbstractModule with AkkaGuiceSupport {
   def configure(): Unit = {
-    bind(classOf[Config]).toInstance(config)
+    bind(classOf[Int]).annotatedWith(Names.named("sd.cb.app")).toInstance(cfg.getInt("sd.cb.app").get)
+    //    val system = ActorSystem("application")
+    //    bind(classOf[ActorSystem]).toInstance(system)
 
-    val system = ActorSystem("application", config)
-    bind(classOf[ActorSystem]).toInstance(system)
+    //bind(classOf[ThiCu]).asEagerSingleton()
   }
 }

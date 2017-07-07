@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: com.sandinh:sd-util_2.11:1.0.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.sandinh/sd-util_2.11/jars/sd-util_2.11-1.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/local/com.sandinh/sd-util_2.11/1.0.0/srcs/sd-util_2.11-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

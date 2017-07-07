@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="SBT 1" modules="statistic">
+      <option name="deprecationWarnings" value="true" />
+      <option name="uncheckedWarnings" value="true" />
+      <parameters>
+        <parameter value="-encoding" />
+        <parameter value="utf8" />
+      </parameters>
+    </profile>
+    <profile name="SBT 2" modules="root">
+      <option name="deprecationWarnings" value="true" />
+      <option name="uncheckedWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <option name="optimiseBytecode" value="true" />
+      <parameters>
+        <parameter value="-encoding" />
+        <parameter value="utf8" />
+        <parameter value="-encoding" />
+        <parameter value="UTF-8" />
+        <parameter value="-Xfuture" />
+        <parameter value="-Ybackend:GenBCode" />
+        <parameter value="-Ydelambdafy:method" />
+        <parameter value="-Yinline-warnings" />
+        <parameter value="-Yinline" />
+        <parameter value="-Ywarn-dead-code" />
+        <parameter value="-Ydead-code" />
+        <parameter value="-Yclosure-elim" />
+        <parameter value="-Ywarn-unused-import" />
+      </parameters>
+    </profile>
+  </component>
+</project>

@@ -7,6 +7,9 @@ var SD = {
         tax_range: {},
         pay: {},
         pay_range: {}
+    },
+    acc: {
+
     }
 };
 
@@ -20,7 +23,9 @@ SD.log.pay = function (doc, meta){
     if(meta.id.charAt(0) != 'l') return;
     var i = meta.id.indexOf('_'),
         app = parseInt(meta.id.charAt(1)),
-        created = parseInt(meta.id.substring(2, i), 36);
+        created = parseInt(meta.id.substring(2, i), 36),
+        d = new Date(created * 1000),
+        key = d.getMonth() + "_" + d.getDate();
     if (app == 0 && doc.m.indexOf("Nạp Bảo") == 0){
         var str = doc.m.replace("VNĐ", "").trim();
         var n = str.lastIndexOf(" ");
@@ -30,20 +35,27 @@ SD.log.pay = function (doc, meta){
             paidBy = 1;
         }else if (str.indexOf("tiền mặt") > 0){
             paidBy = 2;
+        }else if (str.indexOf("Google Wallet") > 0){
+            paidBy = 3;
+        }else if (str.indexOf("Apple Wallet") > 0){
+            paidBy = 4;
         }
-        emit(created, {b: paidBy, n: num, c: doc.d[0][1]} );
+        emit(key, {b: paidBy, n: num, c: doc.d[0][1]} );
+    }else if (app == 0 && doc.m.indexOf("Tặng Bảo miễn phí lần") >= 0){ // 1, 2, 3, 4, 5.
+        var num1 = parseInt(doc.m.replace("Tặng Bảo miễn phí lần ",""));
+        emit(key, {b: 4 + num1, n: 1, c: doc.d[0][1]});
     }
 };
 
 
 SD.log.pay.reduce = function (keys, values, rereduce) {
-    // thẻ cào, SMS, tiền mặt, số bảo.
-    var outRange = [0, 0 , 0, 0];
+    //              thẻ cào, SMS, tiền mặt, google wallet, apple wallet, mp1, mp2, mp3, mp4, mp5, số bảo.
+    var outRange = [0,         0,        0,             0,            0,   0,   0,   0,   0,   0,     0];
 
     if (!rereduce){ // map function
         for (i in values) {
             outRange[values[i].b] += values[i].n;
-            outRange[3] += values[i].c;
+            outRange[10] += values[i].c;
         }
     }else{
         for (i in values) {
@@ -156,35 +168,38 @@ SD.log.tax_range = function (doc, meta) {
             str1 = doc.m.substring(0, pos),
             pos1 = str1.lastIndexOf(' '),
             cuoc = parseInt(str1.substring(pos1 + 1));
-        var range = 0;
-        if (cuoc <= 100000){
-            range = 0;
-        }else if (cuoc <= 500000){
-            range = 1;
-        }else if (cuoc <= 1000000){
-            range = 2;
-        }else if (cuoc <= 2000000){
-            range = 3;
-        }else if (cuoc <= 5000000){
-            range = 4;
-        }else {
-            range = 5;
-        }
+
         var sum = 0;
         doc.d.forEach(function(d){
             sum += d[1];
         });
-        emit(created, {r: range, s: sum});
+        emit(created, {s: sum, a: app, c: cuoc});
     }
 };
 
 SD.log.tax_range.reduce = function (keys, values, rereduce) {
-    // <=100k, <500k, <1M, <2M, <5M, >5M.
-    var outRange = [0, 0 , 0, 0, 0, 0];
+    // <=100k, <500k, <1M, <2M, <5M, >5M,tổng số ván chắn, tổng số ván phỏm, tổng số phế chắn thu được, tổng số phế phỏm thu được.
+    var outRange = [0, 0 , 0, 0, 0, 0, 0, 0, 0 , 0];
 
     if (!rereduce){ // map function
         for (i in values) {
-            outRange[values[i].r] += values[i].s;
+            var range = 0;
+            if (values[i].c <= 100000){
+                range = 0;
+            }else if (values[i].c <= 500000){
+                range = 1;
+            }else if (values[i].c <= 1000000){
+                range = 2;
+            }else if (values[i].c <= 2000000){
+                range = 3;
+            }else if (values[i].c <= 5000000){
+                range = 4;
+            }else {
+                range = 5;
+            }
+            outRange[range] += values[i].s;
+            outRange[values[i].a + 5] += 1;
+            outRange[values[i].a + 7] += values[i].s;
         }
     }else{
         for (i in values) {
@@ -195,3 +210,59 @@ SD.log.tax_range.reduce = function (keys, values, rereduce) {
     }
     return outRange;
 };
+
+
+function (doc, meta) {
+    if (meta.id.charAt(0) != 'a' || meta.id.charAt(1) != '2') return;
+    var i = meta.id.length;
+    var uid = parseInt(meta.id.substring(2, i), 36);
+    emit(uid, {t: doc.t, w: doc.w});
+}
+
+function (keys, values, rereduce) {
+    var out = {u1: 0, u2: 0, t: 0, w: 0};
+    if (!rereduce) {
+        for (i in values) {
+            if (values[i].t > out.t) {
+                out.t = values[i].t;
+                out.u1 = keys[i];
+            }
+            if (values[i].w > out.w) {
+                out.w = values[i].w;
+                out.u2 = keys[i];
+            }
+        }
+    } else {
+        for (i in values) {
+            if (values[i].t > out.t) {
+                out.t = values[i].t;
+                out.u1 = values[i].u1;
+            }
+            if (values[i].w > out.w) {
+                out.w = values[i].w;
+                out.u2 = values[i].u2;
+            }
+        }
+    }
+
+    return out;
+}
+//31-7-2015 11h39p18 GMT+7 = 1438317558
+//truoc 5 phut = 1438317258
+SD.log.chiaga = function(doc, meta){
+    if (meta.id.charAt(0) != 'r'){
+        var i = meta.id.indexOf('_'),
+            app = parseInt(meta.id.charAt(1)),
+            created = parseInt(meta.id.substring(2, i), 36);
+        if (app == 1 && created > 1438317258 && created < 1438317558) {//chan
+            emit(null)
+        }
+    }
+};
+
+SD.acc.thicu = function(doc, meta){
+    if(meta.id.charAt(0) != 'j') return;
+    var uid = parseInt(meta.id.substring(2, meta.id.length), 36);
+    emit(uid, null);
+};
+

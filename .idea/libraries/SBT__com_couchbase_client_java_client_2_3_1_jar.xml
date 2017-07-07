@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: com.couchbase.client:java-client:2.3.1:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.couchbase.client/java-client/jars/java-client-2.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.couchbase.client/java-client/srcs/java-client-2.3.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
